@@ -10,6 +10,7 @@ CLASSES=\
 	Direction.class\
 	TerrainArea.class\
 	Search.class\
+	SearchParallel.class\
 	MonteCarloMinimization.class\
 
 CLASS_FILES=$(CLASSES:%.class=$(BINDIR)/%.class)
@@ -20,4 +21,4 @@ clean:
 	rm -r $(BINDIR)/*.class
 
 run: $(CLASS_FILES)
-	java -cp bin MonteCarloMinimization 50 200 22 19 1 3 
+	java -cp bin MonteCarloMinimization 1000 1000 -300 400  -345 200 20

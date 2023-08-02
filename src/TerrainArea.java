@@ -1,20 +1,17 @@
-
-
-import java.lang.Math.*;
-
-
 public class TerrainArea {
 	
 	public static final int PRECISION = 10000;
 
 	private int rows, columns; //grid size
-	private double xmin, xmax, ymin, ymax; //x and y terrain limits
+	double xmin, xmax, ymin, ymax; //x and y terrain limits
 	private int [][] heights;
 	private int [][] visit;
 	private int grid_points_visited;
 	private int grid_points_evaluated;
 
-    
+    public TerrainArea(){
+		super();
+	}
 	
 	public TerrainArea(int rows, int columns, double xmin, double xmax, double ymin, double ymax) {
 		super();
