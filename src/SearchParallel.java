@@ -1,89 +1,107 @@
-import java.util.Random;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class SearchParallel extends java.util.concurrent.RecursiveTask<Integer> {
+public class SearchParallel extends java.util.concurrent.RecursiveAction{
     private SearchParallel[] arr;
     private int id;
     private int posX,posY;
-    static private TerrainArea terrain;
+    static TerrainArea terrain;
     boolean stopped;
-    private int steps;
+    private static int steps=0;
 
-    final Integer CUT_OFF = 100;
+    private static int min_height=Integer.MAX_VALUE;
+
+    private int start,end;
+    private boolean worker = false;
+    final Integer SEQUENTIAL_CUT_OFF = 5000;
 
 //does it have to be static?Yes I think.
 
-    public SearchParallel(SearchParallel[] arr,int id, int pos_row, int pos_col,TerrainArea terrain) {
+    public SearchParallel(int id) {
 		this.id = id;
-        this.arr = arr;
-		this.posX = pos_row; //randomly allocated
-		this.posY = pos_col; //randomly allocated
-        SearchParallel.terrain = terrain;
-
+        this.arr = null; //randomly allocated
+        posX=ThreadLocalRandom.current().nextInt(terrain.getRow());
+        posY= ThreadLocalRandom.current().nextInt(terrain.getCol());
 		this.stopped = false;
+        worker = true;
 	}
-    @Override
-    //Returns the height of the minimum valley calculated
-    protected Integer compute() {
-        Random rand = new Random();
-        if (arr.length<=CUT_OFF){
-            int local_min=Integer.MAX_VALUE;
-            for (int i=0;i<arr.length;){
-                i++;
-                int temp = local_min;
-                local_min = arr[i].find_valleys();
-                if(local_min>temp){
-                    local_min = temp;
-                }
-                return local_min;
-            }
-        }
-        int half = (int)arr.length/2;
-        SearchParallel [] siri = new SearchParallel[half];
-        SearchParallel [] bing = new SearchParallel[half];
-        for(int i=0;i<half;i++){
-            siri[i] = arr[i];
-            }
-        int j = 0;
-        for(int i=half;i<arr.length;i++){
-            bing[j] = arr[i];
-            j++;
-            }   
-        ForkJoinTask<Integer> right = (new SearchParallel(siri,j, rand.nextInt(posX-1),rand.nextInt(posY-1), terrain)).fork();
-        int left = (new SearchParallel(bing, rand.nextInt(posX-1),j,rand.nextInt(posY-1), terrain)).compute();
-        int rightWing = right.join();
-        return Math.min(left,rightWing);   
-        // TODO Auto-generated method stub
-        
-        
-    }
 
-    public int find_valleys() {	
+    public SearchParallel(SearchParallel[] arr,int start,int end){
+        this.arr = arr;
+        id=0;
+        posX=0;posY=0;
+        this.start=start;this.end=end;
+    }
+    
+
+    public static int find_valleys(SearchParallel search) {
 		int height=Integer.MAX_VALUE;
+        if(search==null)return 	height;
+        int x = search.posX;
+        int y = search.posY;
 		Direction next = Direction.STAY_HERE;
-		while(terrain.visited(posX, posY)==0) { // stop when hit existing path
-			height=terrain.get_height(posX, posY);
-			terrain.mark_visited(posY, posY, id); //mark current position as visited
+		while(terrain.visited(x, y)==0) { // stop when hit existing path
+			height=terrain.get_height(x, y);
+			terrain.mark_visited(x,y, search.id); //mark current position as visited
             steps++;
-			next = terrain.next_step(posX, posY);
+			next = terrain.next_step(x, y);
 			switch(next) {
 				case STAY_HERE: return height; //found local valley
 				case LEFT: 
-					posX--;
+					x--;
+                    if(x<0){return height;}
 					break;
 				case RIGHT:
-					posX=posX+1;
+					x=x+1;
 					break;
 				case UP: 
-					posY=-1;
+					y-=1;
+                    if(y<0) return height;
 					break;
 				case DOWN: 
-					posY=+1;
+					y=+1;
 					break;
 			}
 		}
-		stopped=true;
+		search.stopped=true;
 		return height;
 	}
+
+    static int getHeight(){return min_height;}
+
+    static void setHeight(int x){min_height=x;}
     //This class should extend RecursiveAction from ForkJoin Library
+
+    @Override
+    protected void compute() {
+        if(arr.length<=SEQUENTIAL_CUT_OFF){
+            for (int i=0;i<arr.length;i++){
+                int height=SearchParallel.find_valleys(arr[i]);
+                if(height<SearchParallel.min_height)
+                    {SearchParallel.setHeight(height);}
+            }
+        }
+        else{
+            int mid = arr.length/2;
+            SearchParallel[] first = new SearchParallel[mid];
+            SearchParallel[] second = new SearchParallel[mid];
+            
+            for(int i=0;i<mid;i++){
+                try{
+                first[i] = arr[i];}
+                catch(ArrayIndexOutOfBoundsException e){continue;}
+
+            }
+            for(int i=0;i<mid;i++){
+                second[i] = arr[mid+i];
+            }
+            
+            
+
+            SearchParallel left = (new SearchParallel(first,start,end));
+            left.fork();
+            (new SearchParallel(second,mid,end)).compute();
+            left.join();
+        }
+    }
 }
