@@ -1,8 +1,3 @@
-/* M. Kuttel 2023
- * Searcher class that lands somewhere random on the surfaces and 
- * then moves downhill, stopping at the local minimum.
- */
-
 public class Search {
 	private int id;				// Searcher identifier
 	private int pos_row, pos_col;		// Position in the grid

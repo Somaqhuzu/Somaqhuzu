@@ -6,12 +6,9 @@ public class TerrainArea {
 	double xmin, xmax, ymin, ymax; //x and y terrain limits
 	private int [][] heights;
 	private int [][] visit;
-	private int grid_points_visited;
-	private int grid_points_evaluated;
+	static private int grid_points_visited=0;
+	static private int grid_points_evaluated=0;
 
-    public TerrainArea(){
-		super();
-	}
 	
 	public TerrainArea(int rows, int columns, double xmin, double xmax, double ymin, double ymax) {
 		super();
@@ -71,28 +68,28 @@ public class TerrainArea {
 		Direction climb_direction =Direction.STAY_HERE;
 		int height;
 		int local_min= get_height(x, y);
-		if ( x > 0 ) {
+		if ( x > 0 && y>=0) {
 			height=get_height(x-1, y);
 			if (height<local_min) {
 				local_min=height;
 				climb_direction = Direction.LEFT;
 			}
 		}
-		if ( x < (rows-1) ) {
+		if ( x < (rows-1) && y>=0) {
 			height=get_height(x+1, y);
 			if (height<local_min) {
 				local_min=height;
 				climb_direction = Direction.RIGHT;
 			}
 		}
-		if ( y > 0 ) {
+		if ( y > 0 && x>=0) {
 			height=get_height(x, y-1);
 			if (height<local_min) {
 				local_min=height;
 				climb_direction = Direction.UP;
 			}
 		}
-		if ( y < (columns-1) ) {
+		if ( y < (columns-1) && x>=0) {
 			height=get_height(x, y+1);
 			if (height<local_min) {
 				local_min=height;
@@ -157,6 +154,8 @@ public class TerrainArea {
 	public double getYcoord(int y) {
 		return ymin + ( (ymax - ymin) / columns ) * y;
 	}
+	public int getRow(){return rows;}
+	public int getCol(){return columns;}
 
 
 }
