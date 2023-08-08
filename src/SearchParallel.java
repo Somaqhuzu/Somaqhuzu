@@ -10,6 +10,7 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
     private static int steps=0;
 
     private static int min_height=Integer.MAX_VALUE;
+    static int x,y;
 
     private int start,end;
     static Integer SEQUENTIAL_CUT_OFF;
@@ -29,8 +30,8 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
     public static int find_valleys(SearchParallel search) {
 		int height=Integer.MAX_VALUE;
         if(search==null)return 	height;
-        int x = search.posX;
-        int y = search.posY;
+        int x = (int)search.posX;
+        int y = (int) search.posY;
 		Direction next = Direction.STAY_HERE;
 		while(terrain.visited(x, y)==0) { // stop when hit existing path
 			height=terrain.get_height(x, y);
@@ -61,7 +62,11 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
 
     static int getHeight(){return min_height;}
 
-    static void setHeight(int x){min_height=x;}
+    synchronized static void setHeight(int min,int xpos,int ypos){
+        min_height=min;
+        x =xpos;
+        y = ypos;
+    }
     //This class should extend RecursiveAction from ForkJoin Library
 
     @Override
@@ -70,14 +75,11 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
             for (int i=start;i<end;i++){
                 int height=SearchParallel.find_valleys(SearchParallel.arr[i]);
                 if(height<SearchParallel.min_height)
-                    {SearchParallel.setHeight(height);}
+                    {SearchParallel.setHeight(height,SearchParallel.arr[i].posX,SearchParallel.arr[i].posY);}
             }
         }
         else{
-            int mid = (end-start)/2;
-            if(end/mid ==3){
-                mid = mid + (127/100)*mid; //Deal with this bug
-            }
+            int mid = (end+start)/2;
             SearchParallel left = (new SearchParallel(start,mid));
             left.fork();
             (new SearchParallel(mid,end)).compute();
