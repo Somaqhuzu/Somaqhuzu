@@ -84,7 +84,7 @@ class MonteCarloMinimization {
 		// all searches
 		int min = Integer.MAX_VALUE;
 		int local_min = Integer.MAX_VALUE;
-		int finder = -1;
+		int finder = 0;
 		for (int i = 0; i < num_searches; i++) {
 			local_min = searches[i].find_valleys();
 			if ((!searches[i].isStopped()) && (local_min < min)) { // don't look at those who stopped because hit
@@ -105,21 +105,21 @@ class MonteCarloMinimization {
 			terrain.print_visited();
 		}
 
-		System.out.printf("Run parameters\n");
+		/*System.out.printf("Run parameters\n");
 		System.out.printf("\t Rows: %d, Columns: %d\n", rows, columns);
 		System.out.printf("\t x: [%f, %f], y: [%f, %f]\n", xmin, xmax, ymin, ymax);
 		System.out.printf("\t Search density: %f (%d searches)\n", searches_density, num_searches);
 
 		/* Total computation time */
-		System.out.printf("Time: %d ms\n", endTime - startTime);
-		int tmp = terrain.getGrid_points_visited();
+		System.out.println(endTime - startTime);
+		/*int tmp = terrain.getGrid_points_visited();
 		System.out.printf("Grid points visited: %d  (%2.0f%s)\n", tmp, (tmp / (rows * columns * 1.0)) * 100.0, "%");
 		tmp = terrain.getGrid_points_evaluated();
 		System.out.printf("Grid points evaluated: %d  (%2.0f%s)\n", tmp, (tmp / (rows * columns * 1.0)) * 100.0, "%");
 
-		/* Results */
+		/* Results 
 		System.out.printf("Global minimum: %d at x=%.1f y=%.1f\n\n", min,
-				terrain.getXcoord(searches[finder].getPos_row()), terrain.getYcoord(searches[finder].getPos_col()));
+				terrain.getXcoord(searches[finder].getPos_row()), terrain.getYcoord(searches[finder].getPos_col())); */
 
 	}
 }

@@ -62,12 +62,11 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
 
     static int getHeight(){return min_height;}
 
-    synchronized static void setHeight(int min,int xpos,int ypos){
+    static void setHeight(int min,int xpos,int ypos){
         min_height=min;
         x =xpos;
         y = ypos;
     }
-    //This class should extend RecursiveAction from ForkJoin Library
 
     @Override
     protected void compute() {
@@ -83,8 +82,7 @@ public class SearchParallel extends java.util.concurrent.RecursiveAction{
             SearchParallel left = (new SearchParallel(start,mid));
             left.fork();
             (new SearchParallel(mid,end)).compute();
-            left.join();
-                
+            left.join(); 
             }
         }
     }

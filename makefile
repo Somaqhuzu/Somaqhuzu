@@ -12,6 +12,7 @@ CLASSES=\
 	Search.class\
 	SearchParallel.class\
 	MonteCarloMinimization.class\
+	MonteCarloMinimizationParallel.class\
 
 CLASS_FILES=$(CLASSES:%.class=$(BINDIR)/%.class)
 
@@ -20,5 +21,7 @@ default:$(CLASS_FILES)
 clean:
 	rm -r $(BINDIR)/*.class
 
-run: $(CLASS_FILES)
-	java -cp bin MonteCarloMinimization 1000 1000 -300 400  -345 200 20
+runs: $(CLASS_FILES)
+	java -cp bin MonteCarloMinimization 10000 5000 -300 400 -345 200 0.1
+run:$(CLASS_FILES)
+	java -cp bin MonteCarloMinimizationParallel 10000 5000 -300 400 -345 200 0.1
