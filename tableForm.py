@@ -6,7 +6,7 @@ from prettytable import PrettyTable
 table = PrettyTable(["cutoff","Time","Speeup"])
 
 file = open("output.csv","r")
-k=64
+k=2**25
 serial=int(file.readline())
 table.add_row(["serial",serial,1.0])
 time = " "
@@ -18,5 +18,5 @@ while time!='q':
         break
     cutoff = str(k)  
     table.add_row([cutoff,tt,time])
-    k = k * 2
+    k = int(k / 2)
 print(table)

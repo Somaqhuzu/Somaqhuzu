@@ -1,18 +1,16 @@
 #!/usr/bin/python3
 import os
 import sys
-import multiprocessing as mp
-from prettytable import PrettyTable
 
 def run():
-    k=64
+    k=2**25
     row = str(sys.argv[1])
     col =str(sys.argv[2])
-    os.system("java -cp bin MonteCarloMinimization " + row + " " + col+ " 200 200 22 -200 0.1")
-    for i in range(20): 
+    os.system("java -cp bin MonteCarloMinimization " + row + " " + col+ " 1000 200 222 -2003 0.3")
+    for i in range(25): 
         cutoff = str(k)
-        os.system("java -cp bin MonteCarloMinimizationParallel " +row + " " + col+ " 200 200 22 -200 0.1 " + cutoff)
-        k = k*2
+        os.system("java -cp bin MonteCarloMinimizationParallel " +row + " " + col+ " 1000 200 222 -2003 0.3 " + cutoff)
+        k = int(k/2)
         
 
 if __name__=='__main__':
