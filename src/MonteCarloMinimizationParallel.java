@@ -1,4 +1,8 @@
 import java.util.concurrent.ForkJoinPool;
+import java.util.Scanner;
+import java.io.*;
+
+
 
 public class MonteCarloMinimizationParallel{
 	static long startTime,endTime;
@@ -10,12 +14,27 @@ public class MonteCarloMinimizationParallel{
 	private static void tock() {
 		endTime = System.currentTimeMillis();
 	}
-    public static void main(String [] args){
+    public static void main(String [] args) throws IOException{
         ForkJoinPool pool = new ForkJoinPool();
+
+		BufferedWriter wr=null;
+		File file=null;
+		FileWriter writer=null;
+		try{
+			file = new File("ParallelTime.txt");
+			if(!file.exists()){
+				file.createNewFile();
+			}
+			writer = new FileWriter(file,true);
+			wr = new BufferedWriter(writer);
+		}
+		catch(FileNotFoundException e){
+			System.out.println("File not found");
+		}
 
         int rows, columns; //grid size
     	double xmin, xmax, ymin, ymax; //x and y terrain limits
-   	double searches_density;	// Density - number of Monte Carlo  searches per grid position - usually less than 1!
+   		double searches_density;	// Density - number of Monte Carlo  searches per grid position - usually less than 1!
 
      	int num_searches;		// Number of searches
     	SearchParallel [] searches;		// Array of searche    	
@@ -47,7 +66,9 @@ public class MonteCarloMinimizationParallel{
 		tick();
 		pool.invoke(search);
 		tock();
-		System.out.println((endTime-startTime)); 
+		String time = (endTime-startTime) + "\n";
+		wr.write(time);
+		wr.close();
 
 		/*System.out.printf("Run parameters\n"); 
 		System.out.printf("\t Rows: %d, Columns: %d\n", rows, columns);

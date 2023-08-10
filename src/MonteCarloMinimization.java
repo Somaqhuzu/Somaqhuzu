@@ -8,6 +8,11 @@
  * EduHPC'22 Peachy Assignment" 
  * developed by Arturo Gonzalez Escribano  (Universidad de Valladolid 2021/2022)
  */
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 class MonteCarloMinimization {
@@ -25,7 +30,22 @@ class MonteCarloMinimization {
 		endTime = System.currentTimeMillis();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+
+		BufferedWriter wr=null;
+		File file=null;
+		FileWriter writer=null;
+		try{
+			file = new File("SerialTime.txt");
+			if(!file.exists()){
+				file.createNewFile();
+			}
+			writer = new FileWriter(file,true);
+			wr = new BufferedWriter(writer);
+		}
+		catch(FileNotFoundException e){
+			System.out.println("File not found");
+		}
 
 		int rows, columns; // grid size
 		double xmin, xmax, ymin, ymax; // x and y terrain limits
@@ -111,7 +131,9 @@ class MonteCarloMinimization {
 		System.out.printf("\t Search density: %f (%d searches)\n", searches_density, num_searches);
 
 		/* Total computation time */
-		System.out.println(endTime - startTime);
+		String time = endTime - startTime +"\n";
+		wr.write(time);
+		wr.close();
 		/*int tmp = terrain.getGrid_points_visited();
 		System.out.printf("Grid points visited: %d  (%2.0f%s)\n", tmp, (tmp / (rows * columns * 1.0)) * 100.0, "%");
 		tmp = terrain.getGrid_points_evaluated();
