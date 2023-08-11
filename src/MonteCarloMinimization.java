@@ -8,11 +8,10 @@
  * EduHPC'22 Peachy Assignment" 
  * developed by Arturo Gonzalez Escribano  (Universidad de Valladolid 2021/2022)
  */
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Random;
 
 class MonteCarloMinimization {
@@ -32,20 +31,27 @@ class MonteCarloMinimization {
 
 	public static void main(String[] args) throws IOException {
 
-		BufferedWriter wr=null;
-		File file=null;
-		FileWriter writer=null;
+		/*Speed= totalSearches/timeTook for all searches
+		 *Percent = numberofSearches/totalSearches
+		 * each line on file speed will be in this format --> {Speed,Percent}
+		*/
+		File speed = null;
+		FileWriter speedWriter=null;
+		PrintWriter speedPrinter=null;		
+		
 		try{
-			file = new File("SerialTime.txt");
-			if(!file.exists()){
-				file.createNewFile();
+			speed = new File("SerialSpeed.csv");
+			if (!speed.exists()){
+				speedWriter = new FileWriter(speed);
+				speedPrinter = new PrintWriter(speedWriter);
+				speedPrinter.print("Speed,Percent");
 			}
-			writer = new FileWriter(file,true);
-			wr = new BufferedWriter(writer);
+			else{
+				speedWriter = new FileWriter(speed,true);
+				speedPrinter = new PrintWriter(speedWriter);
+			}
 		}
-		catch(FileNotFoundException e){
-			System.out.println("File not found");
-		}
+		catch(IOException e){System.exit(0);}
 
 		int rows, columns; // grid size
 		double xmin, xmax, ymin, ymax; // x and y terrain limits
@@ -57,7 +63,7 @@ class MonteCarloMinimization {
 		Search[] searches; // Array of searches
 		Random rand = new Random(); // the random number generator
 
-		if (args.length != 7) {
+		if (args.length != 8) {
 			System.out.println("Incorrect number of command line arguments provided.");
 			rows = 100;
 			columns = 100;
@@ -132,8 +138,13 @@ class MonteCarloMinimization {
 
 		/* Total computation time */
 		String time = endTime - startTime +"\n";
-		wr.write(time);
-		wr.close();
+		int tmp = terrain.getGrid_points_visited();
+		double percent = Math.round(((tmp / (rows * columns * 1.0)) * 100.0));
+		double sprint = tmp/(endTime-startTime);
+
+		speedPrinter.printf("\n%s,%s",sprint,percent);
+		speedPrinter.close();
+		System.out.printf("The speed = %.2f searches/ms\n",sprint);
 		/*int tmp = terrain.getGrid_points_visited();
 		System.out.printf("Grid points visited: %d  (%2.0f%s)\n", tmp, (tmp / (rows * columns * 1.0)) * 100.0, "%");
 		tmp = terrain.getGrid_points_evaluated();

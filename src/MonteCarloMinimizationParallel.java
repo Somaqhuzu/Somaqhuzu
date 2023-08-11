@@ -1,5 +1,4 @@
 import java.util.concurrent.ForkJoinPool;
-import java.util.Scanner;
 import java.io.*;
 
 
@@ -17,30 +16,27 @@ public class MonteCarloMinimizationParallel{
     public static void main(String [] args) throws IOException{
         ForkJoinPool pool = new ForkJoinPool();
 
-		BufferedWriter wr=null;
-		BufferedWriter rr=null;
-		File file=null;
-		File hist = null;
-		FileWriter writer=null;
-		FileWriter right=null;
+		/*Speed= totalSearches/timeTook for all searches
+		 *Percent = numberofSearches/totalSearches
+		 * each line on file speed will be in this format --> {Speed,Percent}
+		*/
+		File speed = null;
+		FileWriter speedWriter=null;
+		PrintWriter speedPrinter=null;		
+		
 		try{
-			file = new File("ParallelTime.txt");
-			hist = new File("histogram.txt");
-			if(!file.exists()){
-				file.createNewFile();
+			speed = new File("ParallelSpeed.csv");
+			if (!speed.exists()){
+				speedWriter = new FileWriter(speed);
+				speedPrinter = new PrintWriter(speedWriter);
+				speedPrinter.print("Speed,Percent");
 			}
-			if(!hist.exists()){
-				hist.createNewFile();
+			else{
+				speedWriter = new FileWriter(speed,true);
+				speedPrinter = new PrintWriter(speedWriter);
 			}
-			right = new FileWriter(hist,true);
-			rr= new BufferedWriter(right);
-			writer = new FileWriter(file,true);
-			wr = new BufferedWriter(writer);
-
 		}
-		catch(FileNotFoundException e){
-			System.out.println("File not found");
-		}
+		catch(IOException e){System.exit(0);}
 
         int rows, columns; //grid size
     	double xmin, xmax, ymin, ymax; //x and y terrain limits
@@ -78,12 +74,12 @@ public class MonteCarloMinimizationParallel{
 		tock();
 		String time = (endTime-startTime) + "\n";
 		int tmp = SearchParallel.terrain.getGrid_points_visited();
-		double percent = ((tmp / (rows * columns * 1.0)) * 100.0);
-		rr.write(tmp + "\t"  + percent + "% \n");
-		rr.close();
-		wr.write(time);
-		wr.close();
+		double percent = Math.round(((tmp / (rows * columns * 1.0)) * 100.0));
+		double sprint = tmp/(endTime-startTime);
 
+		speedPrinter.printf("\n%s,%s",sprint,percent);
+		speedPrinter.close();
+		System.out.printf("The speed = %.2f searches/ms\n",sprint);
 		/*System.out.printf("Run parameters\n"); 
 		System.out.printf("\t Rows: %d, Columns: %d\n", rows, columns);
 		System.out.printf("\t x: [%f, %f], y: [%f, %f]\n", xmin, xmax, ymin, ymax);

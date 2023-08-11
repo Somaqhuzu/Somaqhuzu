@@ -1,0 +1,102 @@
+#!/usr/bin/python3
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def runExec(compiler,filePath,*args):
+    """Executes executable file, most probably java files"""
+    print(args)
+    arguments=''
+    for arg in args:
+        arguments = arguments+ " " + arg
+    try:
+        os.system(compiler+filePath+arguments)
+    except:
+        print("Caught Compilation error","Might be because of wrong file path or args")
+
+def execLoop(n,initialSize,dens,filePath):
+    """Loops the execution of the executable(java)"""
+    grid =[]
+    while (n * initialSize) > 10000:
+        n = int(n / 2)
+        initialSize = int(initialSize/2)
+    row = initialSize 
+    col = initialSize
+    for i in range(n):
+        runExec("java",filePath,str(row),str(col),"1000","2000","-2000","321231",str(dens),"3000")
+        grid.append(row*col*dens)
+        row = int(row + 1/10 * row)
+        col = int(col + 1/10 * col)
+    return grid
+
+
+
+def cleanHistData(csvfile):
+    """Collects and cleans data for histogram/bar chart"""
+    file = pd.read_csv(csvfile)
+    speeds = file["Speed"]
+    percentages = file["Percent"]
+    return [speeds,percentages]
+
+def setDataFrame(serialFile,parallelFile,gridSize):
+    """Sets up a dataframe to work with"""
+    dFrame = pd.DataFrame(columns=["GridSize","Algorithm","Search%","Speed"])
+    serialData = cleanHistData(serialFile)
+    parallelData = cleanHistData(parallelFile)
+    serialSpeed = serialData[0]
+    serialPercent = serialData[1]
+    parallelSpeed = parallelData[0]
+    parallelPercent = parallelData[1]
+    speedUp = []
+
+    if(len(serialSpeed)!= len(parallelSpeed)):
+        print("The data are incomparable because the sizes are not equal")
+        return 
+    else:
+        for i in range(len(parallelSpeed)):
+            speed = parallelSpeed[i]/serialSpeed[i]
+            speedUp.append(speed)
+
+    print(len(serialSpeed))
+    print(len(gridSize))
+    if (len(serialSpeed)!= len(gridSize)):
+        print("Data are incompatible due to different size me")
+        return
+    else:
+        k = 1
+        for i in range(len(gridSize)):
+            dFrame.loc[i] = [gridSize[i],"Serial",serialPercent[i],serialSpeed[i]]
+            k = k + i
+            dFrame.loc[k] = [gridSize[i],"Parallel",parallelPercent[i],parallelSpeed]
+    return dFrame
+
+
+def plotHist(sfile,pfile,size):
+    import plotly.express as xpr
+    import matplotlib.pyplot as plt
+    """Plots an histogram/bar chart that takes up x-axis and y-axis from the file"""
+    frame = setDataFrame(sfile,pfile,size)
+    bar = xpr.bar(frame,x="GridSize",y="Search%",color="Algorithm",barmode="group")
+    serie = xpr.data.gapminder().query("'Algorithm'=='Serial'")
+    print(serie)
+   # lines = xpr.line(serie,x="GridSize",y="Speed")
+    #lines.show()
+    print(frame)
+    bar.show()
+    
+    
+if __name__=='__main__':
+    import multiprocessing as mp
+    initSize = int(input("Enter initial size:"))
+    n = int(input("Enter number of times to execute:"))
+    """parallel = mp.Process(target=execLoop,args=[n,initSize," -cp bin MonteCarloMinimizationParallel"])
+    parallel.start()"""
+    execLoop(n,initSize,0.2," -cp bin MonteCarloMinimizationParallel")
+    grid = execLoop(n,initSize,0.2," -cp bin MonteCarloMinimization")
+    plotHist("SerialSpeed.csv","ParallelSpeed.csv",grid)
+
+
+
+    
+

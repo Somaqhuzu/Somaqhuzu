@@ -28,9 +28,8 @@ run:$(CLASS_FILES)
 	java -cp bin MonteCarloMinimizationParallel 10000 5000 -300 400 -345 200 0.1 5000
 
 collectData:
-	python3 datanalysis/graphGen > parallelTime.csv
-tabulateData:
-	python3 datanalysis/tableForm.py
-graphData:
-	python3 datanalysis/graphs.py
+	python3 dataCleaner
+
+cleanCSV:
+	rm -r *.csv
 
