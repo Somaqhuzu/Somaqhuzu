@@ -18,15 +18,25 @@ public class MonteCarloMinimizationParallel{
         ForkJoinPool pool = new ForkJoinPool();
 
 		BufferedWriter wr=null;
+		BufferedWriter rr=null;
 		File file=null;
+		File hist = null;
 		FileWriter writer=null;
+		FileWriter right=null;
 		try{
 			file = new File("ParallelTime.txt");
+			hist = new File("histogram.txt");
 			if(!file.exists()){
 				file.createNewFile();
 			}
+			if(!hist.exists()){
+				hist.createNewFile();
+			}
+			right = new FileWriter(hist,true);
+			rr= new BufferedWriter(right);
 			writer = new FileWriter(file,true);
 			wr = new BufferedWriter(writer);
+
 		}
 		catch(FileNotFoundException e){
 			System.out.println("File not found");
@@ -67,6 +77,10 @@ public class MonteCarloMinimizationParallel{
 		pool.invoke(search);
 		tock();
 		String time = (endTime-startTime) + "\n";
+		int tmp = SearchParallel.terrain.getGrid_points_visited();
+		double percent = ((tmp / (rows * columns * 1.0)) * 100.0);
+		rr.write(tmp + "\t"  + percent + "% \n");
+		rr.close();
 		wr.write(time);
 		wr.close();
 
