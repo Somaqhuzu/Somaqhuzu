@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+import os
+import sys
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+def cleanHistData(file):
+    """Histogram data file being opened with each line in this form {Speedup,% of gridvisited}"""
+    ff = open(file,"r")
+    gridVisits=[]
+    percentages=[]
+    ##lines = ff.readlines()
+    while (ff.readable()):
+        lines = ff.readlines()
+        print(lines)
+        if(lines == []): break
+        #line.split("\t") #=> line = [speedup,% of grid visited]
+        for data in lines:
+            if (data[::2]=='%'): #Second last element should '%' followed by '\n'
+                percentages.append(data)
+            else:
+                gridVisits.append(data)
+    hist = [gridVisits,percentages]
+    return hist
+
+def runExec(compiler,filePath,*args):
+    print(args)
+    arguments=''
+    for arg in args:
+        arguments = arguments, " " , arg
+    try:
+        os.system(compiler + filePath + arguments)
+    except:
+        print("Caught Compilation error","Might be because of wrong file path or args")
+    finally:
+        pass
+        
+
+if __name__=='__main__':
+    runExec("java"," -cp bin MonteCarloMinimizationParallel","1000","1000","200","1000","212","6436","0.1","500")
+    file = input("Enter the name of the file: ")
+    hist = cleanHistData(file)
+
+            
+        
+       
+    
+    
+
