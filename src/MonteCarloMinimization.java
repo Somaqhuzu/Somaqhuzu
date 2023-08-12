@@ -33,7 +33,7 @@ class MonteCarloMinimization {
 
 		/*Speed= totalSearches/timeTook for all searches
 		 *Percent = numberofSearches/totalSearches
-		 * each line on file speed will be in this format --> {Speed,Percent}
+		 * each line on file speed will be in this format --> {Time,Evaluated(points),Visited(points),Search Speed}
 		*/
 		File speed = null;
 		FileWriter speedWriter=null;
@@ -44,7 +44,7 @@ class MonteCarloMinimization {
 			if (!speed.exists()){
 				speedWriter = new FileWriter(speed);
 				speedPrinter = new PrintWriter(speedWriter);
-				speedPrinter.print("Speed,Percent");
+				speedPrinter.print("Time,Evaluated,Visited,Search_Speed");
 			}
 			else{
 				speedWriter = new FileWriter(speed,true);
@@ -63,7 +63,7 @@ class MonteCarloMinimization {
 		Search[] searches; // Array of searches
 		Random rand = new Random(); // the random number generator
 
-		if (args.length != 8) {
+		if (args.length != 7) {
 			System.out.println("Incorrect number of command line arguments provided.");
 			rows = 100;
 			columns = 100;
@@ -137,14 +137,13 @@ class MonteCarloMinimization {
 		System.out.printf("\t Search density: %f (%d searches)\n", searches_density, num_searches);
 
 		/* Total computation time */
-		String time = endTime - startTime +"\n";
-		int tmp = terrain.getGrid_points_visited();
-		double percent = Math.round(((tmp / (rows * columns * 1.0)) * 100.0));
-		double sprint = tmp/(endTime-startTime);
+		String time = endTime - startTime +"";
+		int eval = terrain.getGrid_points_evaluated();
+		int vis = terrain.getGrid_points_visited();
+		double sprint = num_searches/(endTime-startTime);
 
-		speedPrinter.printf("\n%s,%s",sprint,percent);
+		speedPrinter.printf("\n%s,%s,%s,%s",time,eval,vis,sprint);
 		speedPrinter.close();
-		System.out.printf("The speed = %.2f searches/ms\n",sprint);
 		/*int tmp = terrain.getGrid_points_visited();
 		System.out.printf("Grid points visited: %d  (%2.0f%s)\n", tmp, (tmp / (rows * columns * 1.0)) * 100.0, "%");
 		tmp = terrain.getGrid_points_evaluated();

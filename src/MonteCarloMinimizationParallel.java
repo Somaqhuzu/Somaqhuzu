@@ -18,7 +18,7 @@ public class MonteCarloMinimizationParallel{
 
 		/*Speed= totalSearches/timeTook for all searches
 		 *Percent = numberofSearches/totalSearches
-		 * each line on file speed will be in this format --> {Speed,Percent}
+		 * each line on file speed will be in this format -->  {Time,Evaluated(points),Visited(points),Search Speed}
 		*/
 		File speed = null;
 		FileWriter speedWriter=null;
@@ -29,7 +29,7 @@ public class MonteCarloMinimizationParallel{
 			if (!speed.exists()){
 				speedWriter = new FileWriter(speed);
 				speedPrinter = new PrintWriter(speedWriter);
-				speedPrinter.print("Speed,Percent");
+				speedPrinter.print("Time,Evaluated,Visited,Search_Speed");
 			}
 			else{
 				speedWriter = new FileWriter(speed,true);
@@ -43,7 +43,6 @@ public class MonteCarloMinimizationParallel{
    		double searches_density;	// Density - number of Monte Carlo  searches per grid position - usually less than 1!
 
      	int num_searches;		// Number of searches
-    	SearchParallel [] searches;		// Array of searche    	
     	if (args.length!=8) {  
     		/*System.out.println("Incorrect number of command line arguments provided.");   	
     		System.exit(0);*/
@@ -72,14 +71,13 @@ public class MonteCarloMinimizationParallel{
 		tick();
 		pool.invoke(search);
 		tock();
-		String time = (endTime-startTime) + "\n";
-		int tmp = SearchParallel.terrain.getGrid_points_visited();
-		double percent = Math.round(((tmp / (rows * columns * 1.0)) * 100.0));
-		double sprint = tmp/(endTime-startTime);
+		String time = endTime - startTime +"";
+		int eval = SearchParallel.terrain.getGrid_points_evaluated();
+		int vis = SearchParallel.terrain.getGrid_points_visited();
+		double sprint = num_searches/(endTime-startTime);
 
-		speedPrinter.printf("\n%s,%s",sprint,percent);
+		speedPrinter.printf("\n%s,%s,%s,%s",time,eval,vis,sprint);
 		speedPrinter.close();
-		System.out.printf("The speed = %.2f searches/ms\n",sprint);
 		/*System.out.printf("Run parameters\n"); 
 		System.out.printf("\t Rows: %d, Columns: %d\n", rows, columns);
 		System.out.printf("\t x: [%f, %f], y: [%f, %f]\n", xmin, xmax, ymin, ymax);
